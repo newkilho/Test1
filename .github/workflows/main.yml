@@ -18,22 +18,18 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    - name: Init
-      uses: actions/checkout@v2
-
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
       with:
         node-version: "12.x"
-
-      uses: actions/setup-ruby@v1
+    - uses: actions/setup-ruby@v1
       with:
         ruby-version: "2.x"
-
-      uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v1
       with:
         name: Test1.ipa
         path: ios/build/
-
+    - name: Init
     - name: Configure Keychain
       run: |
         security create-keychain -p "" "$KEYCHAIN"
@@ -57,22 +53,11 @@ jobs:
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
-
-    
-    - name: Select latest Xcode
-      run: "sudo xcode-select -s /Applications/Xcode_$XC_VERSION.app"
-
     - name: Install Fastlane
       run: cd ios && bundle install && cd ..
-
-    - name: Install Packages
+    - name: Install packages
       run: yarn install
-
-    - name: Install Pods
-      run: cd ios && pod install && cd..
-
-    - name: Execute Fastlane
+    - name: Install pods
+      run: cd ios && pod install && cd ..
+    - name: Execute Fastlane command
       run: cd ios && fastlane github
-
-    #- name: Run Unit and UI Tests
-    #  run: /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
