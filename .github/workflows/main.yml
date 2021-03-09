@@ -1,3 +1,5 @@
+#https://betterprogramming.pub/deploy-an-ios-app-to-testflight-or-the-app-store-using-github-actions-c4d7082b1430
+
 name: react-native-ios-build-ipa
 on: 
   push:
@@ -20,9 +22,22 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-    
+    - name: Select latest Xcode
+      run: "sudo xcode-select -s /Applications/Xcode_$XCODE_VERSION.app"
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: "12.x"
+    #- uses: actions/setup-ruby@v1
+    #  with:
+    #    ruby-version: "2.x"
+    - name: install fastlane & plugins
+      run: bundle install
+    #- name: Run Unit and UI Tests 
+    #  run: |
+    #    cd ios
+    #    /usr/bin/xcodebuild test -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
+    #    cd ..
     - name: Set up Codesign
       run: |
         gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
