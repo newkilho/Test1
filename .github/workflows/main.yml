@@ -6,9 +6,10 @@ jobs:
   build:
     runs-on: [macos-latest]
     env:
-      XC_VERSION: ${{ '11.4.1' }}
-      XC_PROJECT: ${{ 'Test1.xcodeproj' }}
-      XC_SCHEME: ${{ 'Test1' }}
+      XCODE_VERSION: ${{ '11.4.1' }}
+      XCODE_PROJECT: ${{ 'Test1.xcodeproj' }}
+      XCODE_SCHEME: ${{ 'Test1' }}
+      XCODE_EXPORT_PATH: ${{ './artifacts' }}
 
       KEYCHAIN_FILE: ${{ '/tmp/temp.keychain' }}
 
@@ -20,7 +21,7 @@ jobs:
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
     - name: Select latest Xcode
-      run: "sudo xcode-select -s /Applications/Xcode_$XC_VERSION.app"
+      run: "sudo xcode-select -s /Applications/Xcode_$XCODE_VERSION.app"
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
@@ -31,7 +32,7 @@ jobs:
     #- name: Run Unit and UI Tests 
     #  run: |
     #    cd ios
-    #    /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
+    #    /usr/bin/xcodebuild test -project "$XCODE_PROJECT" -scheme "$XCODE_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
     #    cd ..
     - name: Configure Codesign
       run: |
@@ -73,3 +74,12 @@ jobs:
         pod install
         #xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
         xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+
+    - name: Export for App Store
+      run: | 
+        xcodebuild -exportArchive -archivePath Test1.xcarchive -exportOptionsPlist ExportOptions.Plist -exportPath "$XCODE_EXPORT_PATH"
+    - name: Upload Artifact 
+      uses: actions/upload-artifact@v2 
+      with: 
+        name: Artifacts 
+        path: ./artifacts
