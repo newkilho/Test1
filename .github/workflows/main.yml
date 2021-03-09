@@ -27,7 +27,7 @@ jobs:
 
     - name: checkout
       uses: actions/checkout@v2
-
+    
     - name: install node
       uses: actions/setup-node@v1
       with:
@@ -37,6 +37,9 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: "2.x"
+
+    - name: install package
+      run: npm install && cd ios && pod install --repo-update && cd ..
 
     #- name: install fastlane
     #  run: bundle install
@@ -63,10 +66,5 @@ jobs:
         mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
         cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
 
-    - name: install package
-      run: yarn install && cd ios && pod install --repo-update && cd ..
-
     - name: Build app
-      run: |
-        falstlane run build_app
-
+      run: cd ios && falstlane run build_app && cd ..
