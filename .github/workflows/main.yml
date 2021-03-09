@@ -6,8 +6,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Init
       run: |
-        currentAgentPath=$(dirname $(dirname $RUNNER_WORKSPACE))
-        targetAgentPath="/Users/runner/runners/current"
-        ln -s $currentAgentPath $targetAgentPath
+        cd ios
