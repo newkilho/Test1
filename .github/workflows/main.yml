@@ -18,30 +18,10 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    - name: Configure Keychain
-      run: |
-        security create-keychain -p "" "$KEYCHAIN"
-        security list-keychains -s "$KEYCHAIN"
-        security default-keychain -s "$KEYCHAIN"
-        security unlock-keychain -p "" "$KEYCHAIN"
-        security set-keychain-settings
-    - name: Configure Codesign
+    - name: Test
       run: |
         echo "ls -la"
         echo $GITHUB_WORKSPACE
         echo $HOME
         echo $PWD
-        gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
-        gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
-        security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
-        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
-        mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-
-        cd ".github/secrets"
-        echo `ls *.mobileprovision`
-        for PROVISION in `ls *.mobileprovision`
-        do 
-          echo Hello, world! 
-          UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
-          cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
-        done
+    
