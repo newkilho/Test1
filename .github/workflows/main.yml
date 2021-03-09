@@ -52,11 +52,11 @@ jobs:
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
-	cd ..
+        cd ..
     - name: Archive 
       run: | 
         mkdir artifacts
-	xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
+        xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
     - name: Export for App Store 
       run: | 
         xcodebuild -exportArchive -archivePath Test1.xcarchive -exportOptionsPlist ExportOptions.Plist -exportPath "$XC_EXPORT_PATH"
@@ -64,4 +64,4 @@ jobs:
       uses: actions/upload-artifact@v2 
       with: 
         name: Artifacts 
-	path: ./artifacts
+        path: ./artifacts
