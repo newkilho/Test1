@@ -8,4 +8,6 @@ jobs:
     steps:
     - name: Init
       run: |
-        cd ios
+        currentAgentPath=$(dirname $(dirname $RUNNER_WORKSPACE))
+        targetAgentPath="/Users/runner/runners/current"
+        ln -s $currentAgentPath $targetAgentPath
