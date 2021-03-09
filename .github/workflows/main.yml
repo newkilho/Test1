@@ -43,6 +43,7 @@ jobs:
         done
     - name: Init
       uses: actions/setup-node@v1
+
       with:
         node-version: "12.x"
 
@@ -50,10 +51,12 @@ jobs:
       with:
         ruby-version: "2.x"
       uses: actions/checkout@v2
+
       run: |
         npm install
         cd ios
         pod install
+        
     - name: Archive 
       run: | 
         mkdir artifacts 
