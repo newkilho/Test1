@@ -42,4 +42,4 @@ jobs:
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
-        echo `ls $HOME/Library/MobileDevice/Provisioning Profiles`
+        echo `ls "$HOME/Library/MobileDevice/Provisioning Profiles"`
