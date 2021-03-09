@@ -32,41 +32,35 @@ jobs:
     #    cd ios
     #    /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
     #    cd ..
-    - name: Configure Keychain
-      run: |
-        security create-keychain -p "" "$KEYCHAIN"
-        security list-keychains -s "$KEYCHAIN"
-        security default-keychain -s "$KEYCHAIN"
-        security unlock-keychain -p "" "$KEYCHAIN"
-        security set-keychain-settings
     - name: Configure Codesign
       run: |
         gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
         gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
-        security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
-        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
-        mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
 
-        cd .github/secrets
-        echo `ls *.mobileprovision`
-        for PROVISION in `ls *.mobileprovision`
-        do 
-          UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
-          cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
-        done
-        cd ..
-    - name: Archive 
-      run: |
-        mkdir artifacts
-        npm install
-        cd ios
-        pod install
-        xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
-    - name: Export for App Store 
-      run: | 
-        xcodebuild -exportArchive -archivePath Test1.xcarchive -exportOptionsPlist ExportOptions.Plist -exportPath "$XC_EXPORT_PATH"
-    - name: Upload Artifact 
-      uses: actions/upload-artifact@v2 
-      with: 
-        name: Artifacts 
-        path: ./artifacts
+        #security create-keychain -p "" "$KEYCHAIN"
+        #security list-keychains -s "$KEYCHAIN"
+        #security default-keychain -s "$KEYCHAIN"
+        #security unlock-keychain -p "" "$KEYCHAIN"
+        #security set-keychain-settings
+
+        #security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
+        #security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
+        #mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+
+        #cd .github/secrets
+        #for PROVISION in `ls *.mobileprovision`
+        #do 
+        #  UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
+        #  cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
+        #done
+        #cd ..
+
+        $KEYCHAIN_FILE = $RUNNER_TEMP/temp.keychain
+        security create-keychain -p "" "$KEYCHAIN_FILE"
+        security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
+        security unlock-keychain -p "" "$KEYCHAIN_FILE"
+        security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
+        security list-keychains -d user -s "$KEYCHAIN_FILE"
+
+        mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
+        cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
