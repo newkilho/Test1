@@ -41,7 +41,7 @@ jobs:
 
         security create-keychain -p "" "$KEYCHAIN_FILE"
         security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
-        #security default-keychain -s "$KEYCHAIN_FILE"
+        security default-keychain -s "$KEYCHAIN_FILE"
         security unlock-keychain -p "" "$KEYCHAIN_FILE"
         security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
         security list-keychains -d user -s "$KEYCHAIN_FILE"
@@ -57,8 +57,8 @@ jobs:
         cd ios
         pod install --repo-update
 
-        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
-        xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
+        #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
     - name: Export for App Store
       run: | 
