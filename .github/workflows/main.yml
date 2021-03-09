@@ -1,10 +1,10 @@
 name: react-native-ios-build-ipa
 on: 
   push:
-    branches: [main]
+    branches: main
 jobs:
   build:
-    runs-on: [macos-latest]
+    runs-on: macos-latest
     env:
       XCODE_VERSION: ${{ '11.4.1' }}
       XCODE_PROJECT: ${{ 'Test1.xcodeproj' }}
@@ -34,31 +34,14 @@ jobs:
     #    cd ios
     #    /usr/bin/xcodebuild test -project "$XCODE_PROJECT" -scheme "$XCODE_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
     #    cd ..
-    - name: Configure Codesign
+    - name: Set up Codesign
       run: |
         gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
         gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
 
-        #security create-keychain -p "" "$KEYCHAIN"
-        #security list-keychains -s "$KEYCHAIN"
-        #security default-keychain -s "$KEYCHAIN"
-        #security unlock-keychain -p "" "$KEYCHAIN"
-        #security set-keychain-settings
-
-        #security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
-        #security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
-        #mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-
-        #cd .github/secrets
-        #for PROVISION in `ls *.mobileprovision`
-        #do 
-        #  UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
-        #  cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
-        #done
-        #cd ..
-
         security create-keychain -p "" "$KEYCHAIN_FILE"
         security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
+        #security default-keychain -s "$KEYCHAIN_FILE"
         security unlock-keychain -p "" "$KEYCHAIN_FILE"
         security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
         security list-keychains -d user -s "$KEYCHAIN_FILE"
@@ -70,8 +53,10 @@ jobs:
       run: |
         mkdir artifacts
         npm install
+        react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
         cd ios
-        pod install
+        pod install --repo-update
+
         #xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
         xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
