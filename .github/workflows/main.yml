@@ -46,6 +46,7 @@ jobs:
         security set-keychain-settings "$KEYCHAIN_FILE"
         #security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
         security import "$CERT_FILE" -k "$KEYCHAIN_FILE" -P "$CERT_PASS" -T "/usr/bin/codesign"
+        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_FILE"
         #security default-keychain -s "$KEYCHAIN_FILE"
         security default-keychain -d user -s "$KEYCHAIN_FILE"
         security unlock-keychain -p "" "$KEYCHAIN_FILE"
