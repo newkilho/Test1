@@ -38,8 +38,8 @@ jobs:
       with:
         ruby-version: "2.x"
 
-    - name: install fastlane
-      run: cd ios && bundle install && cd ..
+    #- name: install fastlane
+    #  run: bundle install
     
     #- name: Run Unit and UI Tests 
     #  run: |
@@ -69,3 +69,4 @@ jobs:
     - name: Build app
       run: |
         falstlane run build_app
+
