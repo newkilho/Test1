@@ -5,8 +5,42 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      XC_VERSION: ${{ '11.4.1' }}
+      XC_PROJECT: ${{ 'Test1.xcodeproj' }}
+      XC_SCHEME: ${{ 'Test1' }}
+      KEYCHAIN: ${{ 'test.keychain' }}
+
+      CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
+      PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
+      CERT_FILE_GPG: ${{ '.github/secrets/ios_distribution.p12.gpg' }}
+      PROV_FILE_GPG: ${{ '.github/secrets/Test1.mobileprovision.gpg'}}
+
+      CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
     - uses: actions/checkout@v2
     - name: Init
       run: |
-        cd ios
+    - name: Configure Keychain
+      run: |
+        security create-keychain -p "" "$KEYCHAIN"
+        security list-keychains -s "$KEYCHAIN"
+        security default-keychain -s "$KEYCHAIN"
+        security unlock-keychain -p "" "$KEYCHAIN"
+        security set-keychain-settings
+    - name: Configure Codesign
+      run: |
+        gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
+        gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
+        security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
+        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
+        mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+
+        cd ".github/secrets"
+        echo `ls *.mobileprovision`
+        for PROVISION in `ls *.mobileprovision`
+        do 
+          echo Hello, world! 
+          UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
+          cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
+        done
