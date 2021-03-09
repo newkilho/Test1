@@ -56,7 +56,7 @@ jobs:
     - name: Archive 
       run: |
         mkdir artifacts 
-        xcodebuild archive -project Test1/Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
+        xcodebuild archive -project ./Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
     - name: Export for App Store 
       run: |
         xcodebuild -exportArchive -archivePath Test1.xcarchive -exportOptionsPlist ExportOptions.Plist -exportPath "$XC_EXPORT_PATH" 
