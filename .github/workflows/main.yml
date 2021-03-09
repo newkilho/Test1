@@ -5,44 +5,15 @@ on:
 jobs:
   build:
     runs-on: [macos-latest]
-    env:
-      XC_VERSION: ${{ '11.4.1' }}
-      XC_PROJECT: ${{ 'Test1.xcodeproj' }}
-      XC_SCHEME: ${{ 'Test1' }}
-      KEYCHAIN: ${{ 'test.keychain' }}
-      KEYCHAIN_FILE: ${{ RUNNER_TEMP+'/temp.keychain' }}
-
-      CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
-      PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
-      CERT_FILE_GPG: ${{ '.github/secrets/ios_distribution.p12.gpg' }}
-      PROV_FILE_GPG: ${{ '.github/secrets/Test1.mobileprovision.gpg'}}
-
-      CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    - name: Select latest Xcode
-      run: "sudo xcode-select -s /Applications/Xcode_$XC_VERSION.app"
-    - uses: actions/setup-node@v1
-      with:
-        node-version: "12.x"
-    #- uses: actions/setup-ruby@v1
-    #  with:
-    #    ruby-version: "2.x"
-    #- name: Run Unit and UI Tests 
-    #  run: |
-    #    cd ios
-    #    /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
-    #    cd ..
+    name: react-native-ios-build-ipa
+on: 
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: [macos-latest]
     - name: Configure Codesign
       run: |
-        gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
-        gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
-
-        $KEYCHAIN_FILE = $RUNNER_TEMP/temp.keychain
-        security create-keychain -p "" "$KEYCHAIN_FILE"
-        security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
-        security unlock-keychain -p "" "$KEYCHAIN_FILE"
-        security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
-        security list-keychains -d user -s "$KEYCHAIN_FILE"
-
-        mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
-        cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
+        $KEYCHAIN_FILE = $RUNNER_TEMP+'/temp.keychain'
+        echo $KEYCHAIN_FILE
