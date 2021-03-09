@@ -28,15 +28,44 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: configure node
+    - name: install node
       uses: actions/setup-node@v1
       with:
         node-version: "12.x"
 
-    - name: configure ruby
+    - name: install ruby
       uses: actions/setup-ruby@v1
       with:
         ruby-version: "2.x"
 
-    - name: install fastlane & plugins
-      run: bundle install
+    - name: install fastlane
+      run: cd ios && bundle install && cd ..
+    
+    #- name: Run Unit and UI Tests 
+    #  run: |
+    #    cd ios
+    #    /usr/bin/xcodebuild test -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
+    #    cd ..
+
+    - name: install codesign
+      run: |
+        gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
+        gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
+
+        security create-keychain -p "" "$KEYCHAIN_FILE"
+        security list-keychains -s "$KEYCHAIN_FILE"
+        security default-keychain -s "$KEYCHAIN_FILE"
+        security unlock-keychain -p "" "$KEYCHAIN_FILE"
+        security set-keychain-settings "$KEYCHAIN_FILE"
+        security import "$CERT_FILE" -k "$KEYCHAIN_FILE" -P "$CERT_PASS" -T "/usr/bin/codesign"
+        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_FILE"
+
+        mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
+        cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
+
+    - name: install package
+      run: yarn install && cd ios && pod install --repo-update && cd ..
+
+    - name: Build app
+      run: |
+        falstlane run build_app
