@@ -29,7 +29,6 @@ jobs:
       with:
         name: Test1.ipa
         path: ios/build/
-    - name: Init
     - name: Configure Keychain
       run: |
         security create-keychain -p "" "$KEYCHAIN"
@@ -44,6 +43,7 @@ jobs:
         security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
         security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
         mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+
         cd ".github/secrets"
         echo `ls *.mobileprovision`
         for PROVISION in `ls *.mobileprovision`
@@ -52,3 +52,11 @@ jobs:
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
+    - name: Install Fastlane
+      run: cd ios && bundle install && cd ..
+    - name: Install packages
+      run: yarn install
+    - name: Install pods
+      run: cd ios && pod install && cd ..
+    - name: Execute Fastlane command
+      run: cd ios && fastlane github
