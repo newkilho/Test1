@@ -27,6 +27,7 @@ jobs:
         security set-keychain-settings
     - name: Configure Codesign
       run: |
+        echo $PWD
         gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
         gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
         security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
