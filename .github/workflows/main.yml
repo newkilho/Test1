@@ -10,7 +10,7 @@ jobs:
       XC_PROJECT: ${{ 'Test1.xcodeproj' }}
       XC_SCHEME: ${{ 'Test1' }}
 
-      KEYCHAIN_FILE: ${{ 'temp/temp.keychain' }}
+      KEYCHAIN_FILE: ${{ '/tmp/temp.keychain' }}
 
       CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
       PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
@@ -56,7 +56,6 @@ jobs:
         #done
         #cd ..
 
-        mkdir -p temp
         security create-keychain -p "" "$KEYCHAIN_FILE"
         security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
         security unlock-keychain -p "" "$KEYCHAIN_FILE"
@@ -65,3 +64,11 @@ jobs:
 
         mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
         cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
+
+    - name: Archive 
+      run: |
+        mkdir artifacts
+        npm install
+        cd ios
+        pod install
+        xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
