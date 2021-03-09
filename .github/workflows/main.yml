@@ -10,6 +10,7 @@ jobs:
       XC_PROJECT: ${{ 'Test1.xcodeproj' }}
       XC_SCHEME: ${{ 'Test1' }}
       KEYCHAIN: ${{ 'test.keychain' }}
+      KEYCHAIN_FILE: ${{ RUNNER_TEMP+'/temp.keychain' }}
 
       CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
       PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
