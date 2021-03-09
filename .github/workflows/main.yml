@@ -47,8 +47,8 @@ jobs:
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: "2.x"
+    - uses: actions/checkout@v2
     - name: Init
-      uses: actions/checkout@v2
       run: |
         npm install
         cd ios
