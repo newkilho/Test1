@@ -27,8 +27,7 @@ jobs:
         security set-keychain-settings
     - name: Configure Codesign
       run: |
-        echo `ls -la`
-
+        echo $GITHUB_WORKSPACE
         echo $HOME
         echo $PWD
         gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
