@@ -40,11 +40,12 @@ jobs:
         gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
 
         security create-keychain -p "" "$KEYCHAIN_FILE"
-        security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
+        security list-keychains -d user -s "$KEYCHAIN_FILE"
+        #security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
+	security set-keychain-settings "$KEYCHAIN_FILE"
+        security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
         security default-keychain -s "$KEYCHAIN_FILE"
         security unlock-keychain -p "" "$KEYCHAIN_FILE"
-        security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
-        security list-keychains -d user -s "$KEYCHAIN_FILE"
 
         mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
         cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
@@ -57,7 +58,8 @@ jobs:
         cd ios
         pod install --repo-update
 
-        xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
+	xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration AppStoreDistribution -archivePath "$XCODE_SCHEME.xcarchive"
         #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
     - name: Export for App Store
