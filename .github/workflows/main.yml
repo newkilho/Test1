@@ -6,8 +6,62 @@ jobs:
   build:
     runs-on: [macos-latest]
     env:
-      KEYCHAIN_FILE = ${{ RUNNER_TEMP }}
+      XC_VERSION: ${{ '11.4.1' }}
+      XC_PROJECT: ${{ 'Test1.xcodeproj' }}
+      XC_SCHEME: ${{ 'Test1' }}
+
+      KEYCHAIN_FILE: ${{ 'temp/temp.keychain' }}
+
+      CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
+      PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
+      CERT_FILE_GPG: ${{ '.github/secrets/ios_distribution.p12.gpg' }}
+      PROV_FILE_GPG: ${{ '.github/secrets/Test1.mobileprovision.gpg'}}
+
+      CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
+    - name: Select latest Xcode
+      run: "sudo xcode-select -s /Applications/Xcode_$XC_VERSION.app"
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: "12.x"
+    #- uses: actions/setup-ruby@v1
+    #  with:
+    #    ruby-version: "2.x"
+    #- name: Run Unit and UI Tests 
+    #  run: |
+    #    cd ios
+    #    /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
+    #    cd ..
     - name: Configure Codesign
       run: |
-        echo $KEYCHAIN_FILE+'/temp.keychain'
+        gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
+        gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
+
+        #security create-keychain -p "" "$KEYCHAIN"
+        #security list-keychains -s "$KEYCHAIN"
+        #security default-keychain -s "$KEYCHAIN"
+        #security unlock-keychain -p "" "$KEYCHAIN"
+        #security set-keychain-settings
+
+        #security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
+        #security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
+        #mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+
+        #cd .github/secrets
+        #for PROVISION in `ls *.mobileprovision`
+        #do 
+        #  UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
+        #  cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
+        #done
+        #cd ..
+
+        mkdir -p temp
+        security create-keychain -p "" "$KEYCHAIN_FILE"
+        security set-keychain-settings -lut 21600 "$KEYCHAIN_FILE"
+        security unlock-keychain -p "" "$KEYCHAIN_FILE"
+        security import "$CERT_FILE" -P "$CERT_PASS" -A -t cert -f pkcs12 -k "$KEYCHAIN_FILE"
+        security list-keychains -d user -s "$KEYCHAIN_FILE"
+
+        mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
+        cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
