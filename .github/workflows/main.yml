@@ -11,10 +11,10 @@ jobs:
       XC_SCHEME: ${{ 'Test1' }}
       KEYCHAIN: ${{ 'test.keychain' }}
 
-      CERT_FILE: ${{ './.github/secrets/ios_distribution.p12' }}
-      PROV_FILE: ${{ './.github/secrets/Test1.mobileprovision'}}
-      CERT_FILE_GPG: ${{ './.github/secrets/ios_distribution.p12.gpg' }}
-      PROV_FILE_GPG: ${{ './.github/secrets/Test1.mobileprovision.gpg'}}
+      CERT_FILE: ${{ '~/.github/secrets/ios_distribution.p12' }}
+      PROV_FILE: ${{ '~/.github/secrets/Test1.mobileprovision'}}
+      CERT_FILE_GPG: ${{ '~/.github/secrets/ios_distribution.p12.gpg' }}
+      PROV_FILE_GPG: ${{ '~/.github/secrets/Test1.mobileprovision.gpg'}}
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
