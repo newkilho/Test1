@@ -27,6 +27,7 @@ jobs:
         security set-keychain-settings
     - name: Configure Codesign
       run: |
+        echo "ls -la"
         echo $GITHUB_WORKSPACE
         echo $HOME
         echo $PWD
