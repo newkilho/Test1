@@ -71,4 +71,5 @@ jobs:
         npm install
         cd ios
         pod install
-        xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
+        #xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
+	xcodebuild build -project "$XCODE_SCHEME.xcworkspace" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
