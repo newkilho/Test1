@@ -18,17 +18,17 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
+    - name: Select latest Xcode
+      run: "sudo xcode-select -s /Applications/Xcode_$XC_VERSION.app"
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: "12.x"
-    - uses: actions/setup-ruby@v1
-      with:
-        ruby-version: "2.x"
-    - uses: actions/upload-artifact@v1
-      with:
-        name: Test1.ipa
-        path: ios/build/
+    #- uses: actions/setup-ruby@v1
+    #  with:
+    #    ruby-version: "2.x"
+    - name: Run Unit and UI Tests 
+      run: /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
     - name: Configure Keychain
       run: |
         security create-keychain -p "" "$KEYCHAIN"
@@ -44,7 +44,7 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
         mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
 
-        cd ".github/secrets"
+        cd .github/secrets
         echo `ls *.mobileprovision`
         for PROVISION in `ls *.mobileprovision`
         do 
@@ -52,11 +52,16 @@ jobs:
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
-    - name: Install Fastlane
-      run: cd ios && bundle install && cd ..
-    - name: Install packages
-      run: yarn install
-    - name: Install pods
-      run: cd ios && pod install && cd ..
-    - name: Execute Fastlane command
-      run: cd ios && fastlane github
+	cd ..
+    - name: Archive 
+      run: | 
+        mkdir artifacts
+	xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
+    - name: Export for App Store 
+      run: | 
+        xcodebuild -exportArchive -archivePath Test1.xcarchive -exportOptionsPlist ExportOptions.Plist -exportPath "$XC_EXPORT_PATH"
+    - name: Upload Artifact 
+      uses: actions/upload-artifact@v2 
+      with: 
+        name: Artifacts 
+	path: ./artifacts
