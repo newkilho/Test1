@@ -5,8 +5,9 @@ on:
 jobs:
   build:
     runs-on: [macos-latest]
+    env:
+      KEYCHAIN_FILE = ${{ RUNNER_TEMP }}
     steps:
     - name: Configure Codesign
       run: |
-        $KEYCHAIN_FILE = $RUNNER_TEMP+'/temp.keychain'
-        echo $KEYCHAIN_FILE
+        echo $KEYCHAIN_FILE+'/temp.keychain'
