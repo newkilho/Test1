@@ -54,14 +54,14 @@ jobs:
         cd ios
         pod install
     - name: Archive 
-      run: | 
+      run: |
         mkdir artifacts 
-        xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
+        xcodebuild archive -project Test1/Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
     - name: Export for App Store 
-      run: | 
+      run: |
         xcodebuild -exportArchive -archivePath Test1.xcarchive -exportOptionsPlist ExportOptions.Plist -exportPath "$XC_EXPORT_PATH" 
     - name: Upload Artifact 
       uses: actions/upload-artifact@v2
       with: 
-        name: Artifacts 
+        name: Artifacts
         path: ./artifacts
