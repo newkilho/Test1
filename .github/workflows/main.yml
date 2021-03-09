@@ -27,11 +27,11 @@ jobs:
     #- uses: actions/setup-ruby@v1
     #  with:
     #    ruby-version: "2.x"
-    - name: Run Unit and UI Tests 
-      run: |
-        cd ios
-        /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
-        cd ..
+    #- name: Run Unit and UI Tests 
+    #  run: |
+    #    cd ios
+    #    /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
+    #    cd ..
     - name: Configure Keychain
       run: |
         security create-keychain -p "" "$KEYCHAIN"
@@ -51,14 +51,16 @@ jobs:
         echo `ls *.mobileprovision`
         for PROVISION in `ls *.mobileprovision`
         do 
-          echo Hello, world! 
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
         cd ..
     - name: Archive 
-      run: | 
+      run: |
         mkdir artifacts
+	npm install
+	cd ios
+	pod install
         xcodebuild archive -project Test1.xcodeproj -scheme Test1 -configuration release -archivePath Test1.xcarchive
     - name: Export for App Store 
       run: | 
