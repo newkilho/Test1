@@ -19,6 +19,5 @@ jobs:
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
     - name: Init
-      run: |
-        cd ios
+      run: cd ios
     
