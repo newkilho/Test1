@@ -42,6 +42,14 @@ jobs:
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
     - name: Init
+      uses: actions/setup-node@v1
+      with:
+        node-version: "12.x"
+
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: "2.x"
+      uses: actions/checkout@v2
       run: |
         npm install
         cd ios
