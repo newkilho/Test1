@@ -41,14 +41,14 @@ jobs:
           UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
           cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
         done
-    - uses: actions/setup-node@v1
+      uses: actions/setup-node@v1
       with:
         node-version: "12.x"
-    - uses: actions/setup-ruby@v1
+      uses: actions/setup-ruby@v1
       with:
         ruby-version: "2.x"
-    - uses: actions/checkout@v2
     - name: Init
+      uses: actions/checkout@v2
       run: |
         npm install
         cd ios
