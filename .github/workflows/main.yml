@@ -27,8 +27,7 @@ jobs:
         security set-keychain-settings
     - name: Configure Codesign
       run: |
-        cd ".github/secrets" 
-        echo `ls *.mobileprovision`
+        echo `ls -la`
 
         echo $HOME
         echo $PWD
