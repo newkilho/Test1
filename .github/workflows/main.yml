@@ -59,14 +59,6 @@ jobs:
         pod install --repo-update
 
         #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
-        xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration AppStoreDistribution -archivePath "$XCODE_SCHEME.xcarchive"
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration AppStoreDistribution -archivePath "$XCODE_SCHEME.xcarchive"
+	xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -archivePath "$XCODE_SCHEME.xcarchive"
         #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
-
-    - name: Export for App Store
-      run: | 
-        xcodebuild -exportArchive -archivePath "$XCODE_SCHEME.xcarchive" -exportOptionsPlist ExportOptions.Plist -exportPath "$XCODE_EXPORT_PATH"
-    - name: Upload Artifact 
-      uses: actions/upload-artifact@v2 
-      with: 
-        name: Artifacts 
-        path: ./artifacts
