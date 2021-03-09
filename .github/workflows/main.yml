@@ -6,13 +6,6 @@ jobs:
   build:
     runs-on: [macos-latest]
     steps:
-    name: react-native-ios-build-ipa
-on: 
-  push:
-    branches: [main]
-jobs:
-  build:
-    runs-on: [macos-latest]
     - name: Configure Codesign
       run: |
         $KEYCHAIN_FILE = $RUNNER_TEMP+'/temp.keychain'
