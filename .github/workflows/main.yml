@@ -49,12 +49,10 @@ jobs:
       with:
         ruby-version: "2.x"
       uses: actions/checkout@v2
-    - name: Install
       run: |
         npm install
         cd ios
         pod install
-
     - name: Archive 
       run: | 
         mkdir artifacts 
