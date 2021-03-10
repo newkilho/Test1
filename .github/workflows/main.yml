@@ -73,5 +73,5 @@ jobs:
 
       - name: Build
         run: |
-	  cd ios
-	  fastlane run build_app    
+          cd ios
+          fastlane run build_app    
