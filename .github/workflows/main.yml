@@ -49,6 +49,8 @@ jobs:
         #mkdir artifacts
 
         cd ios
+        pod install --repo-update
+
         #sed -i '' 's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/' "$XCODE_SCHEME.xcodeproj/project.pbxproj"
 
         #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
