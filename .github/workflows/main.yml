@@ -72,5 +72,5 @@ jobs:
         cd ios
         pod install --repo-update
 
-	#fastlane run build_app    
-	fastlane ios adhoc build
+        #fastlane run build_app    
+        fastlane ios adhoc build
