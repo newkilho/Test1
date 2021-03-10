@@ -17,7 +17,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       
       - name: configure ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@master
         with:
           ruby-version: 2.6
 
