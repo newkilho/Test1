@@ -9,14 +9,6 @@ jobs:
     name: Build and release iOS app
     runs-on: macos-latest
     steps:
-      - name: Install and run xcodegen
-        run: brew install xcodegen
-      - uses: actions/checkout@v2
-      #- uses: actions/setup-node@v1
-      #  with:
-      #    node-version: "10.x"
-      #- uses: actions/setup-ruby@v1
-      #  with:
-      #    ruby-version: "2.x"
-      - name: Install Fastlane
-        run: cd ios && bundle install && cd ..
+    - uses: actions/checkout@v2
+    - name: Install Bundle
+      run: bundle install
