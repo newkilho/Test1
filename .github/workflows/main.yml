@@ -6,9 +6,6 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
-    steps:
-      release-ios:
     name: Build and release iOS app
     runs-on: macos-latest
     steps:
