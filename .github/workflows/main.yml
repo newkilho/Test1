@@ -28,3 +28,8 @@ jobs:
       - name: install fastlane & plugins
         run: bundle install
       
+      - name: homebrew & watchman
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" && brew update && brew install watchman
+
+      - name: yarn install
+        run: yarn install
