@@ -39,7 +39,7 @@ jobs:
         ruby-version: "2.x"
 
     - name: install package
-      run: npm install && cd ios && pod install --repo-update && cd ..
+      run: npm install && bundle install && cd ios && pod install --repo-update && cd ..
 
     #- name: install fastlane
     #  run: bundle install
