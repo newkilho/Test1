@@ -13,7 +13,7 @@ jobs:
       XCODE_SCHEME: ${{ 'Test1' }}
       XCODE_EXPORT_PATH: ${{ './artifacts' }}
 
-      KEYCHAIN_FILE: ${{ '/tmp/temp.keychain' }}
+      KEYCHAIN_FILE: ${{ 'temporary.keychain' }}
 
       CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
       PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
@@ -39,7 +39,12 @@ jobs:
     #    ruby-version: "2.x"
 
     - name: install package
-      run: npm install && cd ios && pod install --repo-update && cd ..
+      run: |
+        npm install
+        cd ios
+        pod install --repo-update
+        cd ..
+        #npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
 
     #- name: install fastlane
     #  run: bundle install
@@ -59,20 +64,18 @@ jobs:
         security list-keychains -s "$KEYCHAIN_FILE"
         security default-keychain -s "$KEYCHAIN_FILE"
         security unlock-keychain -p "" "$KEYCHAIN_FILE"
-        security set-keychain-settings "$KEYCHAIN_FILE"
-        security import "$CERT_FILE" -k "$KEYCHAIN_FILE" -P "$CERT_PASS" -T "/usr/bin/codesign"
-        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_FILE"
+        security set-keychain-settings
+        #security set-keychain-settings "$KEYCHAIN_FILE"
+        #security import "$CERT_FILE" -k "$KEYCHAIN_FILE" -P "$CERT_PASS" -T "/usr/bin/codesign"
+        #security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN_FILE"
 
         mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
         cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
 
     - name: Archive 
       run: |
-        mkdir artifacts
-        npm install
-        #npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
-        cd ios
-        pod install --repo-update
+        #mkdir artifacts
 
+        cd ios
         xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
         #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
