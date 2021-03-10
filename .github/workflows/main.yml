@@ -75,7 +75,7 @@ jobs:
         #mkdir artifacts
 
         cd ios
-	sed -i '' 's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/' "$XCODE_SCHEME.xcodeproj/project.pbxproj"
+        sed -i '' 's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/' "$XCODE_SCHEME.xcodeproj/project.pbxproj"
 
         xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
         #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
