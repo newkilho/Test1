@@ -39,9 +39,6 @@ jobs:
     - name: install package
       run: |
         npm install
-        cd ios
-        pod install --repo-update
-        cd ..
         #npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
 
     #- name: install fastlane
@@ -73,4 +70,7 @@ jobs:
     - name: Build
       run: |
         cd ios
-        fastlane run build_app    
+        pod install --repo-update
+
+	#fastlane run build_app    
+	fastlane ios adhoc build
