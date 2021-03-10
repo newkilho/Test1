@@ -70,8 +70,7 @@ jobs:
         mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
         cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
 
-
-      - name: Build
-        run: |
-          cd ios
-          fastlane run build_app    
+    - name: Build
+      run: |
+        cd ios
+        fastlane run build_app    
