@@ -9,6 +9,8 @@ jobs:
     name: Build and release iOS app
     runs-on: macos-latest
     steps:
+      - name: Init
+        run: xcode-select --install
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
