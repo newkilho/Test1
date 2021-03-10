@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Install and run xcodegen
-        run: brew install xcodegen && xcodegen generate
+        run: brew install xcodegen
       - uses: actions/checkout@v2
       #- uses: actions/setup-node@v1
       #  with:
