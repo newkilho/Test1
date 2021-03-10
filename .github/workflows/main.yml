@@ -67,10 +67,14 @@ jobs:
         mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
         cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
 
-    - name: Build
+    - name: Archive 
       run: |
-        cd ios
-        pod install --repo-update
+        #mkdir artifacts
 
-        #fastlane run build_app    
-        fastlane ios adhoc build
+        cd ios
+        #sed -i '' 's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/' "$XCODE_SCHEME.xcodeproj/project.pbxproj"
+
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive" code_sign_style="manual"
+        xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" code_sign_identity="" code_signing_required=no code_signing_allowed=no
+        #CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
