@@ -6,10 +6,11 @@ jobs:
   build:
     runs-on: [macos-latest]
     env:
-      XC_VERSION: ${{ '11.4.1' }}
-      XC_PROJECT: ${{ 'Test1.xcodeproj' }}
-      XC_SCHEME: ${{ 'Test1' }}
-      KEYCHAIN: ${{ 'test.keychain' }}
+      XCODE_VERSION: ${{ '11.4.1' }}
+      XCODE_PROJECT: ${{ 'Test1.xcodeproj' }}
+      XCODE_SCHEME: ${{ 'Test1' }}
+      XCODE_EXPORT_PATH: ${{ './artifacts' }}
+      XCODE_KEYCHAIN: ${{ 'temporary.keychain' }}
 
       CERT_FILE: ${{ '.github/secrets/ios_distribution.p12' }}
       PROV_FILE: ${{ '.github/secrets/Test1.mobileprovision'}}
@@ -18,61 +19,41 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    - name: Init
+    - name: checkout
       uses: actions/checkout@v2
-
-      uses: actions/setup-node@v1
-      with:
-        node-version: "12.x"
-
-      uses: actions/setup-ruby@v1
-      with:
-        ruby-version: "2.x"
-
-      uses: actions/upload-artifact@v1
-      with:
-        name: Test1.ipa
-	path: ios/build/
-
-    - name: Configure Keychain
+    
+    - name: install package
       run: |
-        security create-keychain -p "" "$KEYCHAIN"
-        security list-keychains -s "$KEYCHAIN"
-        security default-keychain -s "$KEYCHAIN"
-        security unlock-keychain -p "" "$KEYCHAIN"
-        security set-keychain-settings
-    - name: Configure Codesign
+        npm install
+        #npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
+        cd ios && pod install --repo-update && cd ..
+
+    - name: install codesign
       run: |
         gpg -d -o "$CERT_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$CERT_FILE_GPG"
         gpg -d -o "$PROV_FILE" --pinentry-mode=loopback --passphrase "$CERT_PASS" "$PROV_FILE_GPG"
-        security import "$CERT_FILE" -k "$KEYCHAIN" -P "$CERT_PASS" -A
-        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
-        mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
 
-        cd ".github/secrets"
-        echo `ls *.mobileprovision`
-        for PROVISION in `ls *.mobileprovision`
-        do 
-          echo Hello, world! 
-          UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i ./$PROVISION)` 
-          cp "./$PROVISION" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision" 
-        done
+        security create-keychain -p "" "$XCODE_KEYCHAIN"
+        security list-keychains -s "$XCODE_KEYCHAIN"
+        security default-keychain -s "$XCODE_KEYCHAIN"
+        security unlock-keychain -p "" "$XCODE_KEYCHAIN"
+        security set-keychain-settings
+        #security set-keychain-settings "$XCODE_KEYCHAIN"
+        #security import "$CERT_FILE" -k "$XCODE_KEYCHAIN" -P "$CERT_PASS" -T "/usr/bin/codesign"
+        #security set-key-partition-list -S apple-tool:,apple: -s -k "" "$XCODE_KEYCHAIN"
 
-    
-    - name: Select latest Xcode
-      run: "sudo xcode-select -s /Applications/Xcode_$XC_VERSION.app"
+        mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
+        cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
 
-    - name: Install Fastlane
-      run: cd ios && bundle install && cd ..
+    - name: Archive 
+      run: |
+        #mkdir artifacts
 
-    - name: Install Packages
-      run: yarn install
+        cd ios
 
-    - name: Install Pods
-      run: cd ios && pod install && cd..
-
-    - name: Execute Fastlane
-      run: cd ios && fastlane github
-
-    #- name: Run Unit and UI Tests
-    #  run: /usr/bin/xcodebuild test -project "$XC_PROJECT" -scheme "$XC_SCHEME" -destination 'platform=iOS Simulator,name=iPhone 11'
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive" code_sign_style="manual"
+        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" code_sign_identity="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release code_sign_identity="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+        #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" code_sign_identity="" code_signing_required=no code_signing_allowed=no
+        #xcodebuild build -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" code_sign_identity="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
