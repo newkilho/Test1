@@ -5,25 +5,19 @@ on:
     branches: [main]
 
 jobs:
-  build-ios:
+  build:
+    runs-on: macos-latest
+    steps:
+      release-ios:
+    name: Build and release iOS app
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      
-      - name: configure node
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://registry.npmjs.org"
-      
-      - name: configure ruby
-        uses: ruby/setup-ruby@v1
+          node-version: "10.x"
+      - uses: actions/setup-ruby@v1
         with:
-          ruby-version: 2.6
-
-      - name: create macos keychain
-        uses: sinoru/actions-setup-keychain@v1.0
-
-      - name: install fastlane & plugins
-        run: bundle install
-      
+          ruby-version: "2.x"
+      - name: Install Fastlane
+        run: cd ios && bundle install && cd ..
