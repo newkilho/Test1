@@ -7,8 +7,8 @@
     <key>method</key>
     <string>app-store</string>
     <key>teamID</key>
-    <string>팀 아이디</string>
-    <key>R38WNPUYWB</key>
+    <string>R38WNPUYWB</string>
+    <key>provisioningProfiles</key>
     <dict>
         <key>net.kilho.Test1</key>
         <string>Test1</string>
