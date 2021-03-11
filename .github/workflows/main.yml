@@ -19,26 +19,26 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
+    #- name: checkout
+    #  uses: actions/checkout@v2
     
-    - name: Cache node modules
-      id: node-cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-modules-
+    #- name: Cache node modules
+    #  id: node-cache
+    #  uses: actions/cache@v2
+    #  env:
+    #    cache-name: cache-node-modules
+    #  with:
+    #    path: node_modules
+    #    key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+    #    restore-keys: |
+    #      ${{ runner.os }}-node-modules-
 
-    - name: install package
-      if: steps.node-cache.outputs.cache-hit != 'true'
-      run: |
-        npm install
-        #npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
-        cd ios && pod install --repo-update && cd ..
+    #- name: install package
+    #  if: steps.node-cache.outputs.cache-hit != 'true'
+    #  run: |
+    #    npm install
+    #    #npx react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios
+    #    cd ios && pod install --repo-update && cd ..
 
     - name: install codesign
       run: |
@@ -49,22 +49,10 @@ jobs:
         security list-keychains -s "$XCODE_KEYCHAIN"
         security default-keychain -s "$XCODE_KEYCHAIN"
         security unlock-keychain -p "" "$XCODE_KEYCHAIN"
-        security set-keychain-settings
-        #security set-keychain-settings "$XCODE_KEYCHAIN"
-        #security import "$CERT_FILE" -k "$XCODE_KEYCHAIN" -P "$CERT_PASS" -T "/usr/bin/codesign"
-        #security set-key-partition-list -S apple-tool:,apple: -s -k "" "$XCODE_KEYCHAIN"
+        security set-keychain-settings "$XCODE_KEYCHAIN"
+        security import "$CERT_FILE" -k "$XCODE_KEYCHAIN" -P "$CERT_PASS" -T "/usr/bin/codesign"
+        security set-key-partition-list -S apple-tool:,apple: -s -k "" "$XCODE_KEYCHAIN"
 
-        mkdir -p "~/Library/MobileDevice/Provisioning Profiles"
-        cp "$PROV_FILE" "~/Library/MobileDevice/Provisioning Profiles"
+        security find-identity -p codesigning
 
-    - name: Archive 
-      run: |
-        #mkdir artifacts
-
-        cd ios
-
-        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
-        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive" code_sign_style="manual"
-        #xcodebuild archive -project "$XCODE_SCHEME.xcodeproj" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive" code_sign_identity="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
-        #xcodebuild archive -workspace "$XCODE_SCHEME.xcworkspace" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive" code_sign_identity="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
-        xcodebuild archive -workspace "$XCODE_SCHEME.xcworkspace" -scheme "$XCODE_SCHEME" -configuration release -archivePath "$XCODE_SCHEME.xcarchive"
+        cp .github/ios/secrets/MyApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PROVISIONING_PROFILE.mobileprovision
