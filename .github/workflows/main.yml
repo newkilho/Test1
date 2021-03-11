@@ -19,8 +19,8 @@ jobs:
 
       CERT_PASS: ${{ secrets.CERTS_PWD }}
     steps:
-    #- name: checkout
-    #  uses: actions/checkout@v2
+    - name: checkout
+      uses: actions/checkout@v2
     
     #- name: Cache node modules
     #  id: node-cache
